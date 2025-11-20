@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Adapter, Post, PublishResult } from "../types.js";
 import { logger } from "../utils/logger.js";
-import { markdownToHtml } from "../utils/markdown.js";
 
 export class WixAdapter implements Adapter {
     name = "wix";

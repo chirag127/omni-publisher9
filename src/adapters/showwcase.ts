@@ -14,7 +14,7 @@ export class ShowwcaseAdapter implements Adapter {
         return false;
     }
 
-    async publish(post: Post): Promise<PublishResult> {
+    async publish(_post: Post): Promise<PublishResult> {
         return {
             platform: this.name,
             success: false,

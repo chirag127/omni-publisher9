@@ -1,6 +1,7 @@
 import GhostAdminAPI from "@tryghost/admin-api";
 import { Adapter, Post, PublishResult } from "../types.js";
 import { logger } from "../utils/logger.js";
+
 import { markdownToHtml } from "../utils/markdown.js";
 
 export class GhostAdapter implements Adapter {

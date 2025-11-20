@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { Post, Adapter, PublishResult, Config } from "./types.js";
+import { Post, Adapter, PublishResult } from "./types.js";
 import {
     logger,
     logPublishSuccess,

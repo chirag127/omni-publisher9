@@ -1,17 +1,14 @@
 import matter from "gray-matter";
 import { marked } from "marked";
 import { Post } from "../types.js";
-import fs from "fs/promises";
-import path from "path";
 
-export async function parseMarkdown(filePath: string): Promise<Post> {
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    const { data, content } = matter(fileContent);
+export function parseMarkdown(content: string): Post {
+    const { data, content: markdownContent } = matter(content);
 
     return {
         title: data.title || "Untitled",
-        slug: data.slug || path.basename(filePath, ".md"),
-        content: content,
+        slug: data.slug, // Caller handles default if missing
+        content: markdownContent,
         description: data.description,
         date: data.date,
         tags: data.tags || [],

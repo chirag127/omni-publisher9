@@ -1,0 +1,73 @@
+name: Publish Content
+
+on:
+    schedule:
+        - cron: "0 9 * * *" # Run daily at 9 AM
+    workflow_dispatch:
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: "pnpm"
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v3
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Publish Posts
+              run: pnpm start
+              env:
+                  DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+                  HASHNODE_TOKEN: ${{ secrets.HASHNODE_TOKEN }}
+                  HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
+                  MEDIUM_INTEGRATION_TOKEN: ${{ secrets.MEDIUM_INTEGRATION_TOKEN }}
+                  MEDIUM_USER_ID: ${{ secrets.MEDIUM_USER_ID }}
+                  WORDPRESS_URL: ${{ secrets.WORDPRESS_URL }}
+                  WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
+                  WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
+                  GHOST_URL: ${{ secrets.GHOST_URL }}
+                  GHOST_ADMIN_KEY: ${{ secrets.GHOST_ADMIN_KEY }}
+                  HUBSPOT_ACCESS_TOKEN: ${{ secrets.HUBSPOT_ACCESS_TOKEN }}
+                  BLOGGER_CLIENT_EMAIL: ${{ secrets.BLOGGER_CLIENT_EMAIL }}
+                  BLOGGER_PRIVATE_KEY: ${{ secrets.BLOGGER_PRIVATE_KEY }}
+                  BLOGGER_BLOG_ID: ${{ secrets.BLOGGER_BLOG_ID }}
+                  TUMBLR_CONSUMER_KEY: ${{ secrets.TUMBLR_CONSUMER_KEY }}
+                  TUMBLR_CONSUMER_SECRET: ${{ secrets.TUMBLR_CONSUMER_SECRET }}
+                  TUMBLR_TOKEN: ${{ secrets.TUMBLR_TOKEN }}
+                  TUMBLR_TOKEN_SECRET: ${{ secrets.TUMBLR_TOKEN_SECRET }}
+                  TUMBLR_BLOG_IDENTIFIER: ${{ secrets.TUMBLR_BLOG_IDENTIFIER }}
+                  WIX_API_KEY: ${{ secrets.WIX_API_KEY }}
+                  WIX_SITE_ID: ${{ secrets.WIX_SITE_ID }}
+                  TELEGRAPH_ACCESS_TOKEN: ${{ secrets.TELEGRAPH_ACCESS_TOKEN }}
+                  MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+                  MASTODON_INSTANCE_URL: ${{ secrets.MASTODON_INSTANCE_URL }}
+                  NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+                  NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+                  STRAPI_URL: ${{ secrets.STRAPI_URL }}
+                  STRAPI_TOKEN: ${{ secrets.STRAPI_TOKEN }}
+                  LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+                  LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
+                  REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+                  REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+                  REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+                  REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+                  REDDIT_SUBREDDIT: ${{ secrets.REDDIT_SUBREDDIT }}
+                  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+            - name: Commit State Changes
+              uses: stefanzweifel/git-auto-commit-action@v5
+              with:
+                  commit_message: "chore: update publish state [skip ci]"
+                  file_pattern: .postmap.json

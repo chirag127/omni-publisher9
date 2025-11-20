@@ -1,0 +1,56 @@
+name: Issue to Post
+
+on:
+    issues:
+        types: [labeled]
+
+jobs:
+    convert-issue:
+        if: github.event.label.name == 'publish'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            issues: write
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+
+            - name: Create Post from Issue
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const path = require('path');
+
+                      const issue = context.payload.issue;
+                      const title = issue.title;
+                      const body = issue.body;
+                      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                      const date = new Date().toISOString().split('T')[0];
+
+                      const content = `---
+                      title: "${title}"
+                      date: "${date}"
+                      slug: "${slug}"
+                      tags: ["issue"]
+                      ---
+
+                      ${body}
+                      `;
+
+                      const filePath = path.join('content', 'posts', `${slug}.md`);
+                      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+                      fs.writeFileSync(filePath, content);
+
+                      console.log(`Created post at ${filePath}`);
+
+            - name: Commit Post
+              uses: stefanzweifel/git-auto-commit-action@v5
+              with:
+                  commit_message: "feat: create post from issue #${{ github.event.issue.number }}"
+                  file_pattern: content/posts/*.md

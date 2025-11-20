@@ -1,11 +1,15 @@
-        if (
-            !process.env.WORDPRESS_URL ||
-            !process.env.WORDPRESS_USERNAME ||
-            !process.env.WORDPRESS_APP_PASSWORD
-        ) {
-            logger.warn(
-                "WORDPRESS_URL, WORDPRESS_USERNAME, or WORDPRESS_APP_PASSWORD is missing"
-            );
+import axios from "axios";
+import { Adapter, Post, PublishResult } from "../types.js";
+import { logger } from "../utils/logger.js";
+import { markdownToHtml } from "../utils/markdown.js";
+
+export class WordPressAdapter implements Adapter {
+    name = "wordpress";
+    enabled = true;
+
+    async validate(): Promise<boolean> {
+        if (!process.env.WORDPRESS_TOKEN || !process.env.WORDPRESS_SITE_ID) {
+            logger.warn("WORDPRESS_TOKEN or WORDPRESS_SITE_ID is missing");
             return false;
         }
         return true;
@@ -13,23 +17,18 @@
 
     async publish(post: Post): Promise<PublishResult> {
         try {
-            const auth = Buffer.from(
-                `${process.env.WORDPRESS_USERNAME}:${process.env.WORDPRESS_APP_PASSWORD}`
-            ).toString("base64");
-
+            // WordPress.com API endpoint
             const response = await axios.post(
-                `${process.env.WORDPRESS_URL}/wp-json/wp/v2/posts`,
+                `https://public-api.wordpress.com/rest/v1.1/sites/${process.env.WORDPRESS_SITE_ID}/posts/new`,
                 {
                     title: post.title,
                     content: markdownToHtml(post.content),
-                    // Better: Convert to HTML first since WP REST API expects HTML in 'content' field usually.
-                    // I will import markdownToHtml from utils.
                     status: "publish",
-                    tags: [], // Handling tags requires tag IDs in WP, skipping for simplicity or need to look up IDs.
+                    tags: post.tags?.join(","),
                 },
                 {
                     headers: {
-                        Authorization: `Basic ${auth}`,
+                        Authorization: `Bearer ${process.env.WORDPRESS_TOKEN}`,
                         "Content-Type": "application/json",
                     },
                 }
@@ -38,8 +37,8 @@
             return {
                 platform: this.name,
                 success: true,
-                url: response.data.link,
-                postId: response.data.id.toString(),
+                url: response.data.URL,
+                postId: response.data.ID.toString(),
             };
         } catch (error: any) {
             return {

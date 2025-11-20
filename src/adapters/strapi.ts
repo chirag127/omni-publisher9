@@ -1,3 +1,11 @@
+import axios from "axios";
+import { Adapter, Post, PublishResult } from "../types.js";
+import { logger } from "../utils/logger.js";
+
+export class StrapiAdapter implements Adapter {
+    name = "strapi";
+    enabled = true;
+
     async validate(): Promise<boolean> {
         if (!process.env.STRAPI_URL || !process.env.STRAPI_TOKEN) {
             logger.warn("STRAPI_URL or STRAPI_TOKEN is missing");
@@ -13,10 +21,10 @@
                 {
                     data: {
                         title: post.title,
-                        content: post.content, // Strapi often uses markdown or rich text
+                        content: post.content,
                         slug: post.slug,
                         publishedAt: new Date().toISOString(),
-                        tags: post.tags, // Assuming a tags relation or field exists
+                        tags: post.tags,
                     },
                 },
                 {

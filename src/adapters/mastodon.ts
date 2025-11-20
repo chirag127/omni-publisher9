@@ -21,6 +21,15 @@ export class MastodonAdapter implements Adapter {
 
     async publish(post: Post): Promise<PublishResult> {
         try {
+            const statusText = `${post.title}\n\n${
+                post.description || ""
+            }\n\n${(post.tags || []).map((t) => `#${t}`).join(" ")}`;
+
+            const response = await axios.post(
+                `${process.env.MASTODON_INSTANCE_URL}/api/v1/statuses`,
+                {
+                    status: statusText,
+                    visibility: "public",
                 },
                 {
                     headers: {
