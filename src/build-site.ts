@@ -8,13 +8,13 @@ const PUBLIC_DIR = path.join(process.cwd(), "public");
 const ASSETS_DIR = path.join(PUBLIC_DIR, "assets");
 
 async function buildSite() {
-  logger.info("Building static site...");
+    logger.info("Building static site...");
 
-  await fs.mkdir(PUBLIC_DIR, { recursive: true });
-  await fs.mkdir(ASSETS_DIR, { recursive: true });
+    await fs.mkdir(PUBLIC_DIR, { recursive: true });
+    await fs.mkdir(ASSETS_DIR, { recursive: true });
 
-  // Create styles.css
-  const cssContent = `
+    // Create styles.css
+    const cssContent = `
     body { font-family: system-ui, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem; color: #333; }
     header { margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
     h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
@@ -25,27 +25,30 @@ async function buildSite() {
     pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; border-radius: 4px; }
     img { max-width: 100%; height: auto; }
   `;
-  await fs.writeFile(path.join(ASSETS_DIR, "styles.css"), cssContent);
+    await fs.writeFile(path.join(ASSETS_DIR, "styles.css"), cssContent);
 
-  const files = await fs.readdir(POSTS_DIR);
-  const posts = [];
+    const files = await fs.readdir(POSTS_DIR);
+    const posts = [];
 
-  for (const file of files) {
-    if (file.endsWith(".md")) {
-      const content = await fs.readFile(path.join(POSTS_DIR, file), "utf-8");
-      const post = parseMarkdown(content);
-      if (!post.slug) post.slug = file.replace(".md", "");
+    for (const file of files) {
+        if (file.endsWith(".md")) {
+            const content = await fs.readFile(
+                path.join(POSTS_DIR, file),
+                "utf-8"
+            );
+            const post = parseMarkdown(content);
+            if (!post.slug) post.slug = file.replace(".md", "");
 
-      const htmlContent = markdownToHtml(post.content);
+            const htmlContent = markdownToHtml(post.content);
 
-      // Create individual post page
-      const postHtml = `
+            // Create individual post page
+            const postHtml = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${post.title} - Omni-Publisher</title>
+  <title>${post.title} - Chirag's Personal blog</title>
   <meta name="description" content="${post.description || ""}">
   <link rel="stylesheet" href="/assets/styles.css">
 </head>
@@ -65,37 +68,40 @@ async function buildSite() {
     </article>
   </main>
   <footer>
-    <p>Powered by Omni-Publisher</p>
+    <p>Powered by Chirag's Personal blog</p>
   </footer>
 </body>
 </html>
       `;
 
-      await fs.writeFile(path.join(PUBLIC_DIR, `${post.slug}.html`), postHtml);
-      posts.push(post);
+            await fs.writeFile(
+                path.join(PUBLIC_DIR, `${post.slug}.html`),
+                postHtml
+            );
+            posts.push(post);
+        }
     }
-  }
 
-  // Create index.html
-  const indexHtml = `
+    // Create index.html
+    const indexHtml = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Omni-Publisher Blog</title>
+  <title>Chirag's Personal blog</title>
   <meta name="description" content="A blog published by Omni-Publisher">
   <link rel="stylesheet" href="/assets/styles.css">
 </head>
 <body>
   <header>
-    <h1>Omni-Publisher Blog</h1>
+    <h1>Chirag's Personal blog</h1>
     <p>Automated content distribution ecosystem.</p>
   </header>
   <main>
     ${posts
-      .map(
-        (post) => `
+        .map(
+            (post) => `
       <article>
         <h2><a href="/${post.slug}.html">${post.title}</a></h2>
         <p>${post.description || ""}</p>
@@ -103,23 +109,23 @@ async function buildSite() {
           ${post.tags ? `Tags: ${post.tags.join(", ")}` : ""}
         </div>
       </article>
-    `,
-      )
-      .join("")}
+    `
+        )
+        .join("")}
   </main>
   <footer>
-    <p>Powered by Omni-Publisher</p>
+    <p>Powered by Chirag's Personal blog</p>
   </footer>
 </body>
 </html>
   `;
 
-  await fs.writeFile(path.join(PUBLIC_DIR, "index.html"), indexHtml);
+    await fs.writeFile(path.join(PUBLIC_DIR, "index.html"), indexHtml);
 
-  logger.info(`Site built successfully with ${posts.length} posts.`);
+    logger.info(`Site built successfully with ${posts.length} posts.`);
 }
 
 buildSite().catch((error) => {
-  logger.error("Error building site", { error });
-  process.exit(1);
+    logger.error("Error building site", { error });
+    process.exit(1);
 });
