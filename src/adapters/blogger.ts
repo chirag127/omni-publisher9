@@ -38,6 +38,9 @@ export class BloggerAdapter implements Adapter {
                 auth: oauth2Client,
             });
 
+            // Add a delay to avoid rate limits (5 seconds)
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+
             const response = await blogger.posts.insert({
                 blogId: process.env.BLOGGER_BLOG_ID,
                 requestBody: {
