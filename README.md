@@ -357,68 +357,6 @@ This section provides **step-by-step instructions** for obtaining API keys and t
 
 **⚠️ Notes:**
 
--   Token expires after a period - you may need to refresh
--   Requires a WordPress.com site (not self-hosted WordPress)
-
----
-
-### 5. 📧 Blogger Service Account
-
-**What it's for:** Publishing to your Blogger/Blogspot blog via Google APIs.
-
-**Steps to obtain:**
-
-1. **Create a Google Cloud Project:**
-
-    - Go to [console.cloud.google.com](https://console.cloud.google.com/)
-    - Click **"Create Project"**
-    - Name it (e.g., "Omni-Publisher Blogger")
-
-2. **Enable Blogger API:**
-
-    - In the project dashboard, go to **"APIs & Services"** → **"Library"**
-    - Search for **"Blogger API v3"**
-    - Click **"Enable"**
-
-3. **Create Service Account:**
-
-    - Go to **"APIs & Services"** → **"Credentials"**
-    - Click **"Create Credentials"** → **"Service Account"**
-    - Name it (e.g., "blogger-publisher")
-    - Grant role: **"Editor"**
-    - Click **"Done"**
-
-4. **Generate JSON Key:**
-
-    - Click on the created service account
-    - Go to **"Keys"** tab
-    - Click **"Add Key"** → **"Create new key"**
-    - Choose **JSON** format
-    - Download the file
-
-5. **Add to `.env`:**
-
-    ```env
-    BLOGGER_SERVICE_ACCOUNT_EMAIL=blogger-publisher@your-project.iam.gserviceaccount.com
-    BLOGGER_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-    BLOGGER_BLOG_ID=1234567890123456789
-    ```
-
-    Extract values from the downloaded JSON file.
-
-**📖 Documentation:** [developers.google.com/blogger](https://developers.google.com/blogger)
-
-**⚠️ Notes:**
-
--   Service account must have access to your Blogger blog
--   Share your blog with the service account email
-
----
-
-### 6. 🎨 Tumblr OAuth 1.0a
-
-**What it's for:** Publishing posts to your Tumblr blog.
-
 **Steps to obtain:**
 
 1. **Register an application:**

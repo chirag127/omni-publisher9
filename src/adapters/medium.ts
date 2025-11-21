@@ -7,13 +7,8 @@ export class MediumAdapter implements Adapter {
     enabled = true;
 
     async validate(): Promise<boolean> {
-        if (
-            !process.env.MEDIUM_INTEGRATION_TOKEN ||
-            !process.env.MEDIUM_USER_ID
-        ) {
-            logger.warn(
-                "MEDIUM_INTEGRATION_TOKEN or MEDIUM_USER_ID is missing"
-            );
+        if (!process.env.MEDIUM_TOKEN || !process.env.MEDIUM_USER_ID) {
+            logger.warn("MEDIUM_TOKEN or MEDIUM_USER_ID is missing");
             return false;
         }
         return true;
@@ -32,7 +27,7 @@ export class MediumAdapter implements Adapter {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${process.env.MEDIUM_INTEGRATION_TOKEN}`,
+                        Authorization: `Bearer ${process.env.MEDIUM_TOKEN}`,
                         "Content-Type": "application/json",
                     },
                 }

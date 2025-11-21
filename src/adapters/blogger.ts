@@ -9,12 +9,13 @@ export class BloggerAdapter implements Adapter {
 
     async validate(): Promise<boolean> {
         if (
-            !process.env.BLOGGER_CLIENT_EMAIL ||
-            !process.env.BLOGGER_PRIVATE_KEY ||
+            !process.env.BLOGGER_CLIENT_ID ||
+            !process.env.BLOGGER_CLIENT_SECRET ||
+            !process.env.BLOGGER_REFRESH_TOKEN ||
             !process.env.BLOGGER_BLOG_ID
         ) {
             logger.warn(
-                "BLOGGER_CLIENT_EMAIL, BLOGGER_PRIVATE_KEY, or BLOGGER_BLOG_ID is missing"
+                "BLOGGER_CLIENT_ID, BLOGGER_CLIENT_SECRET, BLOGGER_REFRESH_TOKEN, or BLOGGER_BLOG_ID is missing"
             );
             return false;
         }
@@ -23,18 +24,19 @@ export class BloggerAdapter implements Adapter {
 
     async publish(post: Post): Promise<PublishResult> {
         try {
-            const auth = new google.auth.GoogleAuth({
-                credentials: {
-                    client_email: process.env.BLOGGER_CLIENT_EMAIL,
-                    private_key: process.env.BLOGGER_PRIVATE_KEY?.replace(
-                        /\\n/g,
-                        "\n"
-                    ),
-                },
-                scopes: ["https://www.googleapis.com/auth/blogger"],
+            const oauth2Client = new google.auth.OAuth2(
+                process.env.BLOGGER_CLIENT_ID,
+                process.env.BLOGGER_CLIENT_SECRET
+            );
+
+            oauth2Client.setCredentials({
+                refresh_token: process.env.BLOGGER_REFRESH_TOKEN,
             });
 
-            const blogger = google.blogger({ version: "v3", auth });
+            const blogger = google.blogger({
+                version: "v3",
+                auth: oauth2Client,
+            });
 
             const response = await blogger.posts.insert({
                 blogId: process.env.BLOGGER_BLOG_ID,
