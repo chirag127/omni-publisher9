@@ -1,6 +1,10 @@
 # Import libraries
 import os
+from dotenv import load_dotenv
 from medium_api import Medium
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get RAPIDAPI_KEY from the environment
 api_key = os.getenv('RAPIDAPI_KEY')
