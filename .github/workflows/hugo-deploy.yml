@@ -288,20 +288,90 @@ jobs:
               run: npm install -g @fleek/cli
 
             - name: Deploy to Fleek
-              # Assumes fleek.json is present or configured via CLI args.
-              # Using simple directory deploy if possible, or triggering site build.
-              # Fleek CLI 'sites deploy' usually works with a linked site.
-              # For simplicity in CI without local linking, we might need to initialize or just use the token.
-              # However, Fleek's recommended CI is often just connecting the repo in their UI.
-              # But to push the *artifact* (public folder) to IPFS via Fleek:
               env:
                   FLEEK_TOKEN: ${{ secrets.FLEEK_TOKEN }}
                   FLEEK_PROJECT_ID: ${{ secrets.FLEEK_PROJECT_ID }}
               continue-on-error: true
               run: |
-                  if [ -n "$FLEEK_TOKEN" ]; then
-                    # Deploy the public folder directly to Fleek
-                    fleek sites deploy --site-id "$FLEEK_PROJECT_ID" --path ./public
-                  else
+                  if [ -z "$FLEEK_TOKEN" ]; then
                     echo "FLEEK_TOKEN not set, skipping Fleek deployment."
+                    exit 0
                   fi
+
+                  # Install jq for JSON processing if not present (usually is on ubuntu-latest)
+                  # But fleek sites list outputs a table, not JSON.
+                  # We will try to match the site ID or Slug.
+
+                  echo "Listing sites to find target..."
+                  SITES_OUTPUT=$(fleek sites list)
+                  echo "$SITES_OUTPUT"
+
+                  # Clean up output to just the table rows (remove header/footer if any)
+                  # The table has headers: Name, Slug, ID
+
+                  # Strategy:
+                  # 1. Check if FLEEK_PROJECT_ID matches a Site ID in the list.
+                  # 2. If not, check if FLEEK_PROJECT_ID matches a Slug.
+                  # 3. If not, try to find a slug matching the repo name 'omni-publisher'.
+                  # 4. Fallback: Pick the first site in the list.
+
+                  TARGET_SLUG=""
+
+                  # Check if FLEEK_PROJECT_ID is a Site ID
+                  if echo "$SITES_OUTPUT" | grep -q "$FLEEK_PROJECT_ID"; then
+                      echo "Found site matching FLEEK_PROJECT_ID."
+                      # Extract slug from the line containing the ID
+                      # Line format: Name   Slug   ID
+                      # We assume ID is the last column or we can parse.
+                      # Let's try to extract the slug column.
+                      # Assuming Slug is the 2nd column? Table formatting can be tricky.
+                      # Let's use regex to find the line.
+                      TARGET_SLUG=$(echo "$SITES_OUTPUT" | grep "$FLEEK_PROJECT_ID" | awk '{print $2}')
+                  fi
+
+                  if [ -z "$TARGET_SLUG" ]; then
+                      echo "FLEEK_PROJECT_ID not found as Site ID. Checking if it is a slug..."
+                      if echo "$SITES_OUTPUT" | grep -q " $FLEEK_PROJECT_ID "; then
+                          TARGET_SLUG="$FLEEK_PROJECT_ID"
+                      fi
+                  fi
+
+                  if [ -z "$TARGET_SLUG" ]; then
+                      echo "Trying to find site by repo name 'omni-publisher'..."
+                      TARGET_SLUG=$(echo "$SITES_OUTPUT" | grep "omni-publisher" | head -n 1 | awk '{print $2}')
+                  fi
+
+                  if [ -z "$TARGET_SLUG" ]; then
+                      echo "Could not identify target site. Defaulting to first available site..."
+                      # Skip header line (Name Slug ID) and separator
+                      TARGET_SLUG=$(echo "$SITES_OUTPUT" | grep -v "Name" | grep -v "\-\-\-" | head -n 1 | awk '{print $2}')
+                  fi
+
+                  if [ -z "$TARGET_SLUG" ]; then
+                      echo "No sites found. Fleek will likely create a new one."
+                      # We can't generate fleek.json without a slug.
+                      # But maybe we can let it create one?
+                      # But the user wants to UPDATE.
+                      echo "Error: Could not resolve a site slug to update."
+                      exit 1
+                  fi
+
+                  echo "Deploying to site slug: $TARGET_SLUG"
+
+                  # Generate fleek.json
+                  cat <<EOF > fleek.json
+                  {
+                    "sites": [
+                      {
+                        "slug": "$TARGET_SLUG",
+                        "distDir": "public"
+                      }
+                    ]
+                  }
+                  EOF
+
+                  echo "Generated fleek.json:"
+                  cat fleek.json
+
+                  # Deploy
+                  fleek sites deploy

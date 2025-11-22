@@ -33,8 +33,8 @@ I started this blog to share what I learn and help others navigate:
 ## Connect With Me
 
 -   **GitHub**: [@chirag127](https://github.com/chirag127)
--   **Twitter**: [@chirag127](https://twitter.com/chirag127)
--   **LinkedIn**: [chirag127](https://linkedin.com/in/chirag127)
+-   **Twitter**: [@singhal127](https://twitter.com/singhal127)
+-   **LinkedIn**: [chirag-singhal1](https://www.linkedin.com/in/chirag-singhal1/)
 
 ---
 
