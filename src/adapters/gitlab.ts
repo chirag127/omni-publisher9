@@ -29,7 +29,7 @@ export class GitLabAdapter implements Adapter {
                 commit_message: `Publish: ${post.title}`,
             };
 
-            const response = await axios.post(
+            await axios.post(
                 `https://gitlab.com/api/v4/projects/${projectId}/repository/files/${encodedPath}`,
                 requestBody,
                 {
@@ -40,7 +40,7 @@ export class GitLabAdapter implements Adapter {
                 }
             );
 
-            const projectPath = response.data.file_path || filePath;
+            // const projectPath = response.data.file_path || filePath;
             // Construct URL to the file in the repo (or Pages URL if known, but repo URL is safer)
             // We don't know the project path (user/repo) easily without another API call,
             // but we can guess or just return the file path.
