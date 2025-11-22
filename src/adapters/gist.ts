@@ -2,16 +2,13 @@ import axios from "axios";
 import type { Adapter, Post, PublishResult } from "../types.js";
 import { logger } from "../utils/logger.js";
 
-export class WriteAsAdapter implements Adapter {
-    name = "writeas";
+export class GistAdapter implements Adapter {
+    name = "gist";
     enabled = true;
 
     async validate(): Promise<boolean> {
-        // Write.as can be used anonymously, but we prefer auth for tracking
-        // If no token, we can still post anonymously?
-        // Let's require token for "my posts" management.
-        if (!process.env.WRITEAS_ACCESS_TOKEN) {
-            logger.warn("WRITEAS_ACCESS_TOKEN is missing");
+        if (!process.env.GITHUB_TOKEN) {
+            logger.warn("GITHUB_TOKEN is missing (required for Gist)");
             return false;
         }
         return true;
@@ -19,36 +16,39 @@ export class WriteAsAdapter implements Adapter {
 
     async publish(post: Post): Promise<PublishResult> {
         try {
+            const filename = `${post.slug}.md`;
+
             const response = await axios.post(
-                "https://write.as/api/posts",
+                "https://api.github.com/gists",
                 {
-                    title: post.title,
-                    body: post.content, // Write.as supports Markdown
-                    tags: post.tags,
+                    description: post.title,
+                    public: true,
+                    files: {
+                        [filename]: {
+                            content: `# ${post.title}\n\n${post.content}\n\n[Original Post](${post.publishedUrl})`,
+                        },
+                    },
                 },
                 {
                     headers: {
-                        Authorization: `Token ${process.env.WRITEAS_ACCESS_TOKEN}`,
-                        "Content-Type": "application/json",
+                        Authorization: `token ${process.env.GITHUB_TOKEN}`,
+                        Accept: "application/vnd.github.v3+json",
                     },
                 }
             );
 
-            const data = response.data.data;
-            const postUrl = `https://write.as/${data.id}`; // Or data.url
-
             return {
                 platform: this.name,
                 success: true,
-                url: data.url || postUrl,
-                postId: data.id,
+                url: response.data.html_url,
+                postId: response.data.id,
             };
         } catch (error: any) {
             if (axios.isAxiosError(error)) {
                 return {
                     platform: this.name,
                     success: false,
-                    error: error.response?.data?.error_msg || error.message,
+                    error: error.response?.data?.message || error.message,
                 };
             }
             return {

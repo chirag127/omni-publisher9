@@ -3,7 +3,7 @@ name: Publish Content
 
 on:
     schedule:
-        - cron: "0 9 * * *" # Run daily at 9 AM
+        - cron: "0 */6 * * *" # Run every 6 hours
     workflow_dispatch:
 
 jobs:
@@ -80,6 +80,34 @@ jobs:
                   THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
                   FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
                   FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+                  # New Platforms
+                  LIVEJOURNAL_USERNAME: ${{ secrets.LIVEJOURNAL_USERNAME }}
+                  LIVEJOURNAL_PASSWORD: ${{ secrets.LIVEJOURNAL_PASSWORD }}
+                  VK_ACCESS_TOKEN: ${{ secrets.VK_ACCESS_TOKEN }}
+                  VK_OWNER_ID: ${{ secrets.VK_OWNER_ID }}
+                  WEIBO_ACCESS_TOKEN: ${{ secrets.WEIBO_ACCESS_TOKEN }}
+                  WEIBO_USER_ID: ${{ secrets.WEIBO_USER_ID }}
+                  PIXNET_API_KEY: ${{ secrets.PIXNET_API_KEY }}
+                  PIXNET_ACCESS_TOKEN: ${{ secrets.PIXNET_ACCESS_TOKEN }}
+                  PIXNET_USERNAME: ${{ secrets.PIXNET_USERNAME }}
+                  PLURK_CONSUMER_KEY: ${{ secrets.PLURK_CONSUMER_KEY }}
+                  PLURK_CONSUMER_SECRET: ${{ secrets.PLURK_CONSUMER_SECRET }}
+                  PLURK_TOKEN: ${{ secrets.PLURK_TOKEN }}
+                  PLURK_TOKEN_SECRET: ${{ secrets.PLURK_TOKEN_SECRET }}
+                  GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+                  GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}
+                  BITBUCKET_USERNAME: ${{ secrets.BITBUCKET_USERNAME }}
+                  BITBUCKET_APP_PASSWORD: ${{ secrets.BITBUCKET_APP_PASSWORD }}
+                  BITBUCKET_WORKSPACE: ${{ secrets.BITBUCKET_WORKSPACE }}
+                  BITBUCKET_REPO_SLUG: ${{ secrets.BITBUCKET_REPO_SLUG }}
+                  WRITEAS_ACCESS_TOKEN: ${{ secrets.WRITEAS_ACCESS_TOKEN }}
+                  NEOCITIES_API_KEY: ${{ secrets.NEOCITIES_API_KEY }}
+                  NEOCITIES_SITENAME: ${{ secrets.NEOCITIES_SITENAME }}
+                  CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+                  CODEBERG_OWNER: ${{ secrets.CODEBERG_OWNER }}
+                  CODEBERG_REPO: ${{ secrets.CODEBERG_REPO }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PASTEBIN_API_KEY: ${{ secrets.PASTEBIN_API_KEY }}
 
             - name: Commit State Changes
               uses: stefanzweifel/git-auto-commit-action@v5
