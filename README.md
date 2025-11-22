@@ -601,21 +601,6 @@ _Required if you want to distribute this tool to other users._
     https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=http://localhost:3000/callback&scope=w_member_social
     ```
 
-    - Exchange code for token using the API
-
-5. **Add to `.env`:**
-    ```env
-    LINKEDIN_TOKEN=your_access_token
-    ```
-
-**📖 Documentation:** [learn.microsoft.com/linkedin/shared/authentication](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authentication)
-
-**⚠️ Notes:**
-
--   Access token expires after 60 days
--   Requires verified LinkedIn app
--   **API Version:** Adapter uses `202510` version header automatically.
-
 ---
 
 ### 13. 🔴 Reddit OAuth 2.0
@@ -1207,19 +1192,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ---
 
 ## 🙏 Credits & Acknowledgments
-
-### Technologies Used
-
--   [Node.js](https://nodejs.org/) - JavaScript runtime
--   [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
--   [pnpm](https://pnpm.io/) - Fast package manager
--   [Biome.js](https://biomejs.dev/) - Linter and formatter
--   [Marked](https://marked.js.org/) - Markdown parser
--   [Gray Matter](https://github.com/jonschlinkert/gray-matter) - Frontmatter parser
-
-### Platform APIs
-
-Thank you to all the platforms for providing free APIs:
 
 -   Dev.to, Hashnode, Medium, WordPress, Blogger, Tumblr, Wix, Telegraph, Mastodon, Notion, Strapi, LinkedIn, Reddit, Discord, Showwcase
 

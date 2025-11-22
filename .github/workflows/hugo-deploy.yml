@@ -213,3 +213,86 @@ jobs:
                   action: "upload"
                   app_location: "/public"
                   skip_app_build: true
+
+    deploy-render:
+        runs-on: ubuntu-latest
+        needs: build
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - name: Deploy to Render
+              # Render deployments are triggered via a Deploy Hook URL, not a direct artifact upload
+              # This step assumes the user has connected their repo to Render as a Static Site
+              run: |
+                  if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+                    curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+                  else
+                    echo "RENDER_DEPLOY_HOOK_URL not set, skipping Render deployment trigger."
+                  fi
+
+    deploy-surge:
+        runs-on: ubuntu-latest
+        needs: build
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: public-site
+                  path: ./public
+
+            - name: Install Surge
+              run: npm install --global surge
+
+            - name: Deploy to Surge
+              run: surge ./public ${{ secrets.SURGE_DOMAIN }} --token ${{ secrets.SURGE_TOKEN }}
+
+    deploy-digitalocean:
+        runs-on: ubuntu-latest
+        needs: build
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - name: Trigger DigitalOcean App Platform Deployment
+              # This job triggers a re-deployment of an existing App Platform app connected to the repo.
+              # It requires the DOCTL_TOKEN (API Token) and DO_APP_ID.
+              uses: digitalocean/action-doctl@v2
+              with:
+                  token: ${{ secrets.DOCTL_TOKEN }}
+            - name: Create Deployment
+              run: |
+                  if [ -n "${{ secrets.DO_APP_ID }}" ]; then
+                    doctl apps create-deployment ${{ secrets.DO_APP_ID }} --force-rebuild
+                  else
+                    echo "DO_APP_ID not set, skipping DigitalOcean deployment trigger."
+                  fi
+
+    deploy-fleek:
+        runs-on: ubuntu-latest
+        needs: build
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: public-site
+                  path: ./public
+
+            - name: Install Fleek CLI
+              run: npm install -g @fleek/cli
+
+            - name: Deploy to Fleek
+              # Assumes fleek.json is present or configured via CLI args.
+              # Using simple directory deploy if possible, or triggering site build.
+              # Fleek CLI 'sites deploy' usually works with a linked site.
+              # For simplicity in CI without local linking, we might need to initialize or just use the token.
+              # However, Fleek's recommended CI is often just connecting the repo in their UI.
+              # But to push the *artifact* (public folder) to IPFS via Fleek:
+              env:
+                  FLEEK_TOKEN: ${{ secrets.FLEEK_TOKEN }}
+                  FLEEK_PROJECT_ID: ${{ secrets.FLEEK_PROJECT_ID }}
+              run: |
+                  if [ -n "$FLEEK_TOKEN" ]; then
+                    # Deploy the public folder directly to Fleek
+                    fleek sites deploy --site-id "$FLEEK_PROJECT_ID" --path ./public
+                  else
+                    echo "FLEEK_TOKEN not set, skipping Fleek deployment."
+                  fi
