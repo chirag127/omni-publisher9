@@ -13,7 +13,7 @@
 
 Built with **Node.js 22**, **TypeScript**, and modern tooling, this system offers:
 
--   ✅ **Zero manual copying** - Automated publishing to 15+ platforms
+-   ✅ **Zero manual copying** - Automated publishing to 32+ platforms
 -   ✅ **Idempotent operations** - Never publish the same content twice
 -   ✅ **Resilient architecture** - Handles API failures gracefully with exponential backoff
 -   ✅ **Static site generation** - Beautiful, SEO-optimized blog site included
@@ -32,15 +32,19 @@ Built with **Node.js 22**, **TypeScript**, and modern tooling, this system offer
 
 ### 🌐 Multi-Platform Publishing
 
-Publish to **21 platforms** simultaneously, including:
+Publish to **32 platforms** simultaneously, including:
 
--   **Developer Communities**: Dev.to, Hashnode, Showwcase
--   **Mainstream**: Medium, WordPress.com, LinkedIn
--   **Social Media Link Sharing**: Telegram, Bluesky, X/Twitter, Threads, Facebook
--   **Social**: Tumblr, Mastodon, Reddit, Discord
--   **Enterprise**: Notion, Strapi
--   **CMS**: Blogger, Wix
--   **Anonymous**: Telegraph
+-   **Developer Communities**: Dev.to, Hashnode
+-   **CMS & Blogging**: Medium⚠️, WordPress.com, Blogger, Tumblr, Wix
+-   **Social Networks**: LinkedIn⚠️, Mastodon, Reddit, Discord
+-   **Social Media Sharing**: Twitter/X⚠️, Bluesky, Threads, Facebook Pages, Telegram
+-   **Code Platforms**: GitLab, Bitbucket, GitHub Gist, Codeberg, Pastebin
+-   **Static Hosting**: Neocities, EdgeOne
+-   **Enterprise/CMS**: Notion, Strapi
+-   **International**: LiveJournal, VK, Weibo, Pixnet, Plurk
+-   **Other**: Telegraph (anonymous), Showwcase⚠️ (beta)
+
+⚠️ = API limitations or changes (see platform-specific sections for details)
 
 ### 🛡️ Resilient Publishing Engine
 
@@ -172,10 +176,11 @@ This section provides **step-by-step instructions** for obtaining API keys and t
 
 **What it's for:** Publishing articles to Medium (legacy feature).
 
-> **⚠️ CRITICAL WARNING (Late 2025):** Medium has **permanently closed its API to new integrations** as of early 2025.
+> [!CAUTION] > **Medium API is PERMANENTLY CLOSED** (archived March 2, 2023)
 >
-> -   **New Users:** You CANNOT generate a new token. This platform is effectively unavailable for automated publishing unless you already have a token.
-> -   **Existing Users:** If you generated a token before Jan 2025, it _may_ still work, but support is not guaranteed.
+> -   **New Users**: Cannot obtain tokens - this platform is unavailable
+> -   **Existing Users**: Legacy tokens (pre-2023) may still work but are unsupported
+> -   **Recommended Alternatives**: Dev.to, Hashnode, or WordPress.com
 
 **Steps to obtain (Legacy/Grandfathered only):**
 
@@ -189,7 +194,7 @@ This section provides **step-by-step instructions** for obtaining API keys and t
 
 **📖 Documentation:** [github.com/Medium/medium-api-docs](https://github.com/Medium/medium-api-docs) (Archived)
 
-**Alternative:** Consider using the **Unofficial Medium API** (via RapidAPI) if you strictly need automation, though this requires a separate subscription and adapter modification.
+**Alternative:** Consider migrating to Dev.to or Hashnode, which offer similar features with active API support.
 
 ---
 
@@ -546,6 +551,13 @@ _Required if you want to distribute this tool to other users._
 
 **What it's for:** Posting articles to your LinkedIn profile.
 
+> [!NOTE] > **2025 API Update**: LinkedIn introduced versioned APIs with new requirements:
+>
+> -   New base URL: `https://api.linkedin.com/rest/` (replaces `/v2/`)
+> -   Required header: `LinkedIn-Version: YYYYMM` (e.g., "202510")
+> -   Legacy `/v2/` endpoints being sunset progressively
+> -   This adapter has been updated for the new versioning system ✅
+
 **Steps to obtain:**
 
 1. **Create LinkedIn App:**
@@ -781,15 +793,29 @@ _Required if you want to distribute this tool to other users._
     TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret
     ```
 
-**📖 Documentation:** [developer.twitter.com/en/docs/twitter-api](https://developer.twitter.com/en/docs/twitter-api)
+**📚 Documentation:** [developer.twitter.com/en/docs/twitter-api](https://developer.twitter.com/en/docs/twitter-api)
 
-**⚠️ Notes:**
+> [!WARNING] > **2025 API Changes**: X has significantly reduced free tier limits and increased paid tier pricing.
 
--   **Free Tier Limits:** 1,500 tweets per month (~50 per day)
+**2025 Rate Limits:**
+
+| Tier  | Monthly Cost | Posts/Month | Read Requests/Month |
+| ----- | ------------ | ----------- | ------------------- |
+| Free  | $0           | 50-500\*    | 100                 |
+| Basic | $200         | 10,000      | 15,000              |
+| Pro   | $5,000       | Unlimited   | 1M                  |
+
+_\*Exact free tier limit varies by source (50-500 posts/month) - check current X developer documentation_
+
+**Notes:**
+
 -   Uses OAuth 1.0a for authentication
 -   Character limit: 280 characters including link
+-   Basic tier doubled in price (was $100/month in 2024)
 
 ---
+
+## 📚 Usage
 
 ### Publishing Content
 
@@ -892,7 +918,7 @@ omni-publisher9/
 │   │   ├── devto.ts
 │   │   ├── hashnode.ts
 │   │   ├── medium.ts
-│   │   └── ... (15+ adapters)
+│   │   └── ... (32 adapters)
 │   ├── utils/
 │   │   ├── logger.ts      # Structured JSON logging
 │   │   ├── markdown.ts    # Markdown to HTML parser
