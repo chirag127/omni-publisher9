@@ -50,7 +50,7 @@ export class RedditAdapter implements Adapter {
       const accessToken = tokenResponse.data.access_token;
 
       // 2. Submit Link to first subreddit (or all if needed)
-      const subreddits = process.env.REDDIT_SUBREDDITS!.split(",").map((s) => s.trim());
+      const subreddits = process.env.REDDIT_SUBREDDITS?.split(",").map((s) => s.trim());
       const firstSubreddit = subreddits[0];
 
       const response = await axios.post(
@@ -72,7 +72,7 @@ export class RedditAdapter implements Adapter {
 
       // Extract URL from response
       let postUrl = "";
-      if (response.data && response.data.json && response.data.json.data) {
+      if (response.data?.json?.data) {
         postUrl = response.data.json.data.url || "";
       }
 

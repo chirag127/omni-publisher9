@@ -1,5 +1,5 @@
-import path from "path";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { logger } from "./utils/logger.js";
 
 const SEED_POSTS_FILE = path.join(process.cwd(), "src", "data", "seed_posts.json");

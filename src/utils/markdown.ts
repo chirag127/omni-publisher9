@@ -22,6 +22,6 @@ export function markdownToHtml(markdown: string): string {
 }
 
 export function extractExcerpt(markdown: string, length = 160): string {
-  const text = markdown.replace(/[#*`\[\]]/g, "").replace(/\n/g, " ");
-  return text.length > length ? text.substring(0, length) + "..." : text;
+  const text = markdown.replace(/[#*`[\]]/g, "").replace(/\n/g, " ");
+  return text.length > length ? `${text.substring(0, length)}...` : text;
 }
